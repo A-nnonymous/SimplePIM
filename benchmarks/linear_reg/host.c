@@ -1,102 +1,99 @@
+#include <assert.h>
+#include <dpu.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <time.h>
-#include <dpu.h>
 
-#include "../../lib/processing/gen_red/GenRed.h"
-#include "../../lib/processing/ProcessingHelperHost.h"
 #include "../../lib/communication/CommOps.h"
 #include "../../lib/management/Management.h"
+#include "../../lib/processing/ProcessingHelperHost.h"
+#include "../../lib/processing/gen_red/GenRed.h"
 #include "../../lib/timer.h"
 #include "Param.h"
 
-FILE* fp;
+FILE *fp;
 
-
-void read_csv_to_arr(FILE* fp, T* arr, int32_t len, int32_t d){
+void read_csv_to_arr(FILE *fp, T *arr, int32_t len, int32_t d) {
   if (fp == NULL) {
-        fprintf(stderr, "Error reading file\n");
-        return;
-    }
+    fprintf(stderr, "Error reading file\n");
+    return;
+  }
 
-    float tmp;
-    for (size_t i = 0; i < len; i++){
-      for(size_t j = 0; j < d-1; j++){
-        fscanf(fp, "%f,", &tmp);
-        arr[i*d+j] = (T)tmp;
-      }
-      fscanf(fp, "%f\n", &tmp);
-      arr[i*d+d-1] = (T)tmp;
+  float tmp;
+  for (size_t i = 0; i < len; i++) {
+    for (size_t j = 0; j < d - 1; j++) {
+      fscanf(fp, "%f,", &tmp);
+      arr[i * d + j] = (T)tmp;
     }
+    fscanf(fp, "%f\n", &tmp);
+    arr[i * d + d - 1] = (T)tmp;
+  }
 
-    fclose(fp);
+  fclose(fp);
 }
 
-void write_time_to_csv(double* arr, int32_t len){
+void write_time_to_csv(double *arr, int32_t len) {
   if (fp == NULL) {
-        fprintf(stderr, "Error reading file\n");
-        return;
-    }
+    fprintf(stderr, "Error reading file\n");
+    return;
+  }
 
+  for (size_t i = 0; i < len; i++) {
+    fprintf(fp, "%f\n", arr[i] / 1000.0);
+  }
 
-    for (size_t i = 0; i < len; i++){
-      fprintf(fp,"%f\n", arr[i]/1000.0);
-    }
-
-    fclose(fp);
+  fclose(fp);
 }
 
-void compute_gradients(const T*arr){
+void compute_gradients(const T *arr) {
 
   // [X|Y] -> [X], [Y]
-  T* X = malloc(num_elements*dim*sizeof(T));
-  T* Y = malloc(num_elements*sizeof(T));
-  for(uint32_t i=0; i<num_elements; i++){
-    for(uint32_t j=0; j<dim; j++){
-      X[i*dim+j] = arr[i*(dim+1)+j];
+  T *X = malloc(num_elements * dim * sizeof(T));
+  T *Y = malloc(num_elements * sizeof(T));
+  for (uint32_t i = 0; i < num_elements; i++) {
+    for (uint32_t j = 0; j < dim; j++) {
+      X[i * dim + j] = arr[i * (dim + 1) + j];
     }
-    Y[i] = arr[i*(dim+1)+dim];
+    Y[i] = arr[i * (dim + 1) + dim];
   }
 
   // actual code
-  T* weights = malloc(dim*sizeof(T));
+  T *weights = malloc(dim * sizeof(T));
 
   for (uint32_t n = 0; n < dim; n++) {
     weights[n] = 0;
   }
 
-  int64_t dot_product; 
+  int64_t dot_product;
   int64_t e;
-  int64_t* gradient_tmp = (int64_t*) calloc(dim, sizeof(int64_t)); 
-  for (uint32_t i = 0; i < iter; ++i){
+  int64_t *gradient_tmp = (int64_t *)calloc(dim, sizeof(int64_t));
+  for (uint32_t i = 0; i < iter; ++i) {
     for (uint32_t n = 0; n < dim; ++n) {
       gradient_tmp[i] = 0;
     }
 
     for (uint32_t j = 0; j < num_elements; ++j) {
-        dot_product = 0; 
-        for (uint32_t k = 0; k < dim; k++) {
-          dot_product += X[j*dim + k] * weights[k]; 
-        }
+      dot_product = 0;
+      for (uint32_t k = 0; k < dim; k++) {
+        dot_product += X[j * dim + k] * weights[k];
+      }
 
-        e = dot_product-(Y[j]<<shift_amount);
-        for (uint32_t l = 0; l < dim; l++) {
-                gradient_tmp[l] += X[j*dim + l] * e >> prevent_overflow_shift_amount; 
-        }
+      e = dot_product - (Y[j] << shift_amount);
+      for (uint32_t l = 0; l < dim; l++) {
+        gradient_tmp[l] += X[j * dim + l] * e >> prevent_overflow_shift_amount;
+      }
     }
   }
 
   printf("\nthe gradients on host: \n");
-  for(int i=0; i<dim; i++){
+  for (int i = 0; i < dim; i++) {
     printf("%lld ", gradient_tmp[i]);
   }
   printf("\n");
-
 }
 
-void get_output_file(int num_dpus, int dim, int num_elem){
+void get_output_file(int num_dpus, int dim, int num_elem) {
   char str1[10];
   char str2[10];
   char str3[10];
@@ -105,20 +102,19 @@ void get_output_file(int num_dpus, int dim, int num_elem){
   sprintf(str3, "%d", num_elem);
   char out[100] = "results/framework_";
   strcat(out, str1);
-  strcat(out,"_");
+  strcat(out, "_");
   strcat(out, str2);
-  strcat(out,"_");
+  strcat(out, "_");
   strcat(out, str3);
-  fp = fopen (out, "w");
+  fp = fopen(out, "w");
 }
 
+int main() {
+  simplepim_management_t *table_management = table_management_init(dpu_number);
+  printf("dim: %d, num_elem: %d, iter: %d, lr: %f \n", dim, num_elements, iter,
+         lr);
 
-
-int main(){
-  simplepim_management_t* table_management = table_management_init(dpu_number);
-  printf("dim: %d, num_elem: %d, iter: %d, lr: %f \n", dim, num_elements, iter, lr);
-
-  // reading arguments 
+  // reading arguments
   /*
   fp = fopen ("data/args.csv", "r");
   if (fp == NULL) {
@@ -140,64 +136,66 @@ int main(){
   */
   // data contains y also as last element
 
-
   // inputs
-  //printf("reading the input data\n");
-  T* elements = (T*)malloc_scatter_aligned(num_elements, (dim+1)*sizeof(T), table_management);
-  
-  fp = fopen ("data/input.csv", "r");
-  read_csv_to_arr(fp, elements, num_elements, dim+1);
-  
+  // printf("reading the input data\n");
+  T *elements = (T *)malloc_scatter_aligned(num_elements, (dim + 1) * sizeof(T),
+                                            table_management);
+
+  fp = fopen("data/input.csv", "r");
+  read_csv_to_arr(fp, elements, num_elements, dim + 1);
+
   // weights data
-  T* weights = malloc_broadcast_aligned(1, sizeof(T)*dim, table_management);
-  float* weights_float = malloc_broadcast_aligned(1, sizeof(T)*dim, table_management);
-  for(int i=0; i<dim; i++){
-      weights[i] = 0;
+  T *weights = malloc_broadcast_aligned(1, sizeof(T) * dim, table_management);
+  float *weights_float =
+      malloc_broadcast_aligned(1, sizeof(T) * dim, table_management);
+  for (int i = 0; i < dim; i++) {
+    weights[i] = 0;
   }
 
-  int64_t* gradients_dpu = malloc(dim*sizeof(T));
+  int64_t *gradients_dpu = malloc(dim * sizeof(T));
   compute_gradients(elements);
 
-  if(print_info){
+  if (print_info) {
     printf("initial weight data \n");
-    for(int i=0; i<dim; i++){
-      printf("%d ",weights[i]);
+    for (int i = 0; i < dim; i++) {
+      printf("%d ", weights[i]);
     }
     printf("\n");
   }
   printf("end of reading data from file\n");
-  simplepim_scatter("t1", elements, num_elements, (dim+1)*sizeof(T), table_management);
-  uint32_t data_offset = lookup_table("t1", table_management)->end; 
-  simplepim_broadcast("t2", weights, 1, dim*sizeof(T),  table_management);
-  uint32_t weights_offset = lookup_table("t2", table_management)->end; 
+  simplepim_scatter("t1", elements, num_elements, (dim + 1) * sizeof(T),
+                    table_management);
+  uint32_t data_offset = lookup_table("t1", table_management)->end;
+  simplepim_broadcast("t2", weights, 1, dim * sizeof(T), table_management);
+  uint32_t weights_offset = lookup_table("t2", table_management)->end;
 
-  handle_t* va_handle = create_handle("lin_reg_funcs", REDUCE);
+  handle_t *va_handle = create_handle("lin_reg_funcs", REDUCE);
 
-  for(int l=0; l<iter; l++){
-    int64_t* res = table_gen_red("t1", "t3",  dim*sizeof(int64_t), 1, va_handle, table_management, data_offset);
+  for (int l = 0; l < iter; l++) {
+    int64_t *res = table_gen_red("t1", "t3", dim * sizeof(int64_t), 1,
+                                 va_handle, table_management, data_offset);
 
-    //free_table("t2", table_management);
-    //free_table("t3", table_management);
-    simplepim_broadcast("t2", weights, 1, dim*sizeof(T), table_management);
+    // free_table("t2", table_management);
+    // free_table("t3", table_management);
+    simplepim_broadcast("t2", weights, 1, dim * sizeof(T), table_management);
 
-    for(int i=0; i<dim; i++){
+    for (int i = 0; i < dim; i++) {
       gradients_dpu[i] = res[i];
     }
     free(res);
   }
 
-  
   printf("the gradients of linear model: \n");
-  for(int i=0; i<dim; i++){
+  for (int i = 0; i < dim; i++) {
     printf("%lld ", gradients_dpu[i]);
   }
   printf("\n");
-  
 
   /*
 
   // preparing and parsing argument
-  dpu_arguments_t* input_args = (dpu_arguments_t*) malloc(num_dpus * sizeof(dpu_arguments_t));
+  dpu_arguments_t* input_args = (dpu_arguments_t*) malloc(num_dpus *
+  sizeof(dpu_arguments_t));
 
   for(int i=0; i<num_dpus; i++){
      input_args[i].input_start_offset = 0;
@@ -211,8 +209,8 @@ int main(){
   }
 
 
-  prepare_input_len_and_parse_args(set, input_args, num_elements, dim*sizeof(T), num_dpus);
-  stop(&timer, 0);
+  prepare_input_len_and_parse_args(set, input_args, num_elements, dim*sizeof(T),
+  num_dpus); stop(&timer, 0);
   //printf("end of parsing arguments to upmem\n");
 
   // launch actual dpu code
@@ -229,8 +227,8 @@ int main(){
     }
 
     start(&timer, 2, it);
-    gather_tables_to_host(set, grads_table, 1, X_dim*sizeof(T), end_offset, num_dpus, zero_init, add);
-    stop(&timer, 2);
+    gather_tables_to_host(set, grads_table, 1, X_dim*sizeof(T), end_offset,
+  num_dpus, zero_init, add); stop(&timer, 2);
 
     start(&timer, 3, it);
     for(int i=0; i<X_dim; i++){
@@ -256,26 +254,26 @@ int main(){
   print(&timer, 5, 1);
   printf("\n");
   printf("initial CPU-DPU input transfer (ms): ");
-	print(&timer, 0, 1);
+        print(&timer, 0, 1);
   printf("\n");
-	printf("DPU Kernel Time (ms): ");
-	print(&timer, 1, iter);
+        printf("DPU Kernel Time (ms): ");
+        print(&timer, 1, iter);
   printf("\n");
-	printf("DPU-CPU Time (ms): ");
-	print(&timer, 2, iter);
+        printf("DPU-CPU Time (ms): ");
+        print(&timer, 2, iter);
   printf("\n");
-	printf("CPU combine table Time (ms): ");
-	print(&timer, 3, iter);
+        printf("CPU combine table Time (ms): ");
+        print(&timer, 3, iter);
   printf("\n");
-	printf("CPU-DPU Time (ms): ");
-	print(&timer, 4, iter);
+        printf("CPU-DPU Time (ms): ");
+        print(&timer, 4, iter);
   printf("\n");
 
   float total_time = timer.time[0];
   for(int i=1; i<5; i++){
     total_time += timer.time[i];
   }
-  
+
   printf("total time added up (ms): %f\n", total_time/1000);
 
   printf("the weights of linear model: \n");

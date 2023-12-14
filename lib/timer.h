@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <sys/time.h>
 typedef struct Timer {
-
   struct timeval startTime[6];
   struct timeval stopTime[6];
   double time[6];

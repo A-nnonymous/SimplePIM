@@ -2,7 +2,6 @@
 void combine_table_entries(void *table1, void *table2, uint32_t table_size,
                            uint32_t value_size,
                            void (*combineFunc)(void *, void *)) {
-
   uint32_t curr_entry;
 
   for (int i = 0; i < table_size; ++i) {

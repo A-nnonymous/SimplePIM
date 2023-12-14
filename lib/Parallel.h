@@ -1,6 +1,5 @@
 #ifndef PARALLEL_H
 #define PARALLEL_H
-#include "mutex.h"
 #include <alloc.h>
 #include <defs.h>
 #include <mram.h>
@@ -13,6 +12,7 @@
 #include "StructsPIM.h"
 #include "Table.h"
 #include "TableShared.h"
+#include "mutex.h"
 
 void map_dpu(__mram_ptr void *inputs, __mram_ptr void *outputs,
              uint32_t input_type, uint32_t output_type, uint32_t len);

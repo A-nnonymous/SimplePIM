@@ -95,7 +95,6 @@ void gen_red_dpu(__mram_ptr void *inputs, __mram_ptr void *outputs,
   if (shift_bits == 0) {
     for (int i = pid * copy_block_size_in_bytes; i < divisible_len_in_bytes;
          i += stride) {
-
       mram_read((__mram_ptr void *)(elements + i), elems_block,
                 copy_block_size_in_bytes);
 
@@ -113,7 +112,6 @@ void gen_red_dpu(__mram_ptr void *inputs, __mram_ptr void *outputs,
   } else {
     for (int i = pid * copy_block_size_in_bytes; i < divisible_len_in_bytes;
          i += stride) {
-
       mram_read((__mram_ptr void *)(elements + i), elems_block,
                 copy_block_size_in_bytes);
 
@@ -131,7 +129,6 @@ void gen_red_dpu(__mram_ptr void *inputs, __mram_ptr void *outputs,
 
   // handle last block
   if (pid == NR_TASKLETS - 1 && rest_len_in_bytes != 0) {
-
     mram_read((__mram_ptr void *)(elements + divisible_len_in_bytes),
               elems_block, copy_block_size_in_bytes);
 

@@ -1,13 +1,14 @@
 #ifndef TABLE_H
 #define TABLE_H
-#include "StructsPIM.h"
-#include "TableHost.h"
-#include "TableShared.h"
 #include <alloc.h>
 #include <barrier.h>
 #include <defs.h>
 #include <mram.h>
 #include <stdio.h>
+
+#include "StructsPIM.h"
+#include "TableHost.h"
+#include "TableShared.h"
 
 void init_table(table_t *t, uint32_t table_size, uint32_t value_size,
                 void (*init_func)(uint32_t, void *));

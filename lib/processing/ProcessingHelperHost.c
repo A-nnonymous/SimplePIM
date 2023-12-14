@@ -1,6 +1,5 @@
 #include "ProcessingHelperHost.h"
 handle_t *create_handle(const char *func_pathname, uint32_t func_type) {
-
   handle_t *handle = malloc(sizeof(handle_t));
   handle->func_type = func_type;
   handle->bin_location = malloc(2048);

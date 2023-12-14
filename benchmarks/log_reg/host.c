@@ -63,7 +63,6 @@ void get_output_file(int num_dpus, int dim, int num_elem) {
 }
 
 void compute_gradients(const T *arr) {
-
   // [X|Y] -> [X], [Y]
   T *X = malloc(num_elements * dim * sizeof(T));
   T *Y = malloc(num_elements * sizeof(T));
@@ -126,7 +125,6 @@ int main() {
 
   if (print_info) {
     for (int i = 0; i < num_elements; i++) {
-
       for (int j = 0; j < dim + 1; j++) {
         printf("%f ", elements[i * dim + j]);
       }

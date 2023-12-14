@@ -8,7 +8,6 @@
 void combine_table_entries(void *table1, void *table2, uint32_t table_size,
                            uint32_t value_size,
                            void (*combineFunc)(void *, void *)) {
-
   uint32_t curr_entry;
 
   for (int i = 0; i < table_size; ++i) {
@@ -34,7 +33,6 @@ void gather_tables_to_host(simplepim_management_t *table_management,
   }
 
   DPU_FOREACH(set, dpu, i) {
-
     DPU_ASSERT(dpu_prepare_xfer(dpu, tables + i * aligned_table_size));
   }
   DPU_ASSERT(dpu_push_xfer(set, DPU_XFER_FROM_DPU, DPU_MRAM_HEAP_POINTER_NAME,

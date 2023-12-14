@@ -1,10 +1,6 @@
 #ifndef GENRED_H
 #define GENRED_H
 
-#include "../../communication/CommOps.h"
-#include "../ProcessingHelperHost.h"
-#include "GenRedArgs.h"
-
 #include <dlfcn.h>
 #include <dpu.h>
 #include <omp.h>
@@ -12,6 +8,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+
+#include "../../communication/CommOps.h"
+#include "../ProcessingHelperHost.h"
+#include "GenRedArgs.h"
 
 /*
     table_gen_red implements the array reduction as in the paper

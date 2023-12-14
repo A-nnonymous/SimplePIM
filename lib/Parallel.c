@@ -1,4 +1,5 @@
 #include "Parallel.h"
+
 #include "../benchmarks/UserPath.h"
 #include _user_h_
 
@@ -121,13 +122,11 @@ void map_dpu(__mram_ptr void *inputs, __mram_ptr void *outputs,
 
   for (uint32_t i_elem = i_elem_init; i_elem < i_elem_divisible_len;
        i_elem += i_elem_stride) {
-
     mram_read((__mram_ptr void *)(i_elem), elems_block, block_size_inputs);
 
     inter = inter_block;
     for (uint32_t j_elem = (uint32_t)elems_block;
          j_elem < j_elem_unroll_block_end; j_elem += j_elem_block_size) {
-
       elem = (void *)j_elem;
       map_func(elem, inter);
 
@@ -424,7 +423,6 @@ void combine_oncache_dpu(__mram_ptr void *table_entries_mram,
   uint32_t stride = copy_block_size * num_tasklets * elem_type_size;
   for (int i = pid * copy_block_size_in_bytes; i < total_len_in_bytes;
        i += stride) {
-
     mram_read((__mram_ptr void *)(&((char *)elements)[i]), elems_block,
               copy_block_size_in_bytes);
 
@@ -505,7 +503,6 @@ void combine_shared_dpu(__mram_ptr void *table_entries_mram,
   uint32_t stride = copy_block_size * num_tasklets * elem_type_size;
   for (int i = pid * copy_block_size_in_bytes; i < total_len_in_bytes;
        i += stride) {
-
     mram_read((__mram_ptr void *)(&((char *)elements)[i]), elems_block,
               copy_block_size_in_bytes);
 

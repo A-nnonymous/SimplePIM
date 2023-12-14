@@ -1,12 +1,13 @@
 #ifndef MAPPROCESSING_H
 #define MAPPROCESSING_H
-#include "../ProcessingHelper.h"
 #include <alloc.h>
 #include <barrier.h>
 #include <defs.h>
 #include <mram.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "../ProcessingHelper.h"
 #include __mapfunc_filename__
 
 BARRIER_INIT(barrier_p, NR_TASKLETS);
@@ -51,13 +52,11 @@ void map_dpu(__mram_ptr void *inputs, __mram_ptr void *outputs,
 
   for (int i = pid * copy_block_size; i < divisible_len;
        i += block_times_tasklets) {
-
     mram_read((__mram_ptr void *)(i_elem), elems_block, block_size_inputs);
     inter = inter_block;
     elem = elems_block;
 
     for (uint32_t j = 0; j < unroll_block_size; j += 4) {
-
       map_func(elem, inter);
 
       elem += elem_type_size;
@@ -177,7 +176,6 @@ void zip_map_dpu(__mram_ptr void *inputs1, __mram_ptr void *inputs2,
   if (input_type1 == 4 && input_type2 == 4) {
     for (int i = pid * copy_block_size; i < divisible_len;
          i += block_times_tasklets) {
-
       mram_read((__mram_ptr void *)(i_input1), inputs1_block,
                 input1_block_size);
       mram_read((__mram_ptr void *)(i_input2), inputs2_block,
@@ -186,7 +184,6 @@ void zip_map_dpu(__mram_ptr void *inputs1, __mram_ptr void *inputs2,
       input_elem1 = inputs1_block;
       input_elem2 = inputs2_block;
       for (uint32_t j = 0; j < unroll_block_size; j += 4) {
-
         ((int32_t *)elem)[0] = *(int32_t *)input_elem1;
         ((int32_t *)elem)[1] = *(int32_t *)input_elem2;
         map_func(elem, inter);
@@ -233,7 +230,6 @@ void zip_map_dpu(__mram_ptr void *inputs1, __mram_ptr void *inputs2,
   } else {
     for (int i = pid * copy_block_size; i < divisible_len;
          i += block_times_tasklets) {
-
       mram_read((__mram_ptr void *)(i_input1), inputs1_block,
                 input1_block_size);
       mram_read((__mram_ptr void *)(i_input2), inputs2_block,
@@ -242,7 +238,6 @@ void zip_map_dpu(__mram_ptr void *inputs1, __mram_ptr void *inputs2,
       input_elem1 = inputs1_block;
       input_elem2 = inputs2_block;
       for (uint32_t j = 0; j < copy_block_size; j++) {
-
         for (int k = 0; k < input_type_1_div_4; k++) {
           ((int32_t *)elem)[k] = ((int32_t *)input_elem1)[k];
         }
@@ -291,7 +286,6 @@ void zip_map_dpu(__mram_ptr void *inputs1, __mram_ptr void *inputs2,
     input_elem2 = inputs2_block;
 
     for (uint32_t j = 0; j < rest_len; j++) {
-
       for (int k = 0; k < input_type_1_div_4; k++) {
         ((int32_t *)elem)[k] = ((int32_t *)input_elem1)[k];
       }

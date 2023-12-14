@@ -47,7 +47,6 @@ void write_time_to_csv(double *arr, int32_t len) {
 }
 
 void compute_gradients(const T *arr) {
-
   // [X|Y] -> [X], [Y]
   T *X = malloc(num_elements * dim * sizeof(T));
   T *Y = malloc(num_elements * sizeof(T));

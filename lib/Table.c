@@ -75,7 +75,6 @@ void combine_tables_lockfree(__mram_ptr void *table_entries_mram,
     // global table is empty&&on heap, and store local table on heap
     store_shared_table_on_heap(local_table, table_entries_mram);
   } else {
-
     // a helper table for global merge
     fsb_allocator_t global_table_allocator;
     if (pid == 0) {

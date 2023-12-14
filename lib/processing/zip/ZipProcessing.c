@@ -62,10 +62,8 @@ void zip_dpu(__mram_ptr void *table_entries_1, __mram_ptr void *table_entries_2,
 
   if (types_div_4) {
     if (types_are_ints) {
-
       for (int i = pid_times_block_size; i < divisible_len;
            i += block_times_tasklets) {
-
         mram_read((__mram_ptr void *)table_entries_1 + i_input1, input1_block,
                   input_block_size_1);
         mram_read((__mram_ptr void *)table_entries_2 + i_input2, input2_block,
@@ -78,7 +76,6 @@ void zip_dpu(__mram_ptr void *table_entries_1, __mram_ptr void *table_entries_2,
         output = output_block;
 
         for (int j = 0; j < copy_block_size; j += 2) {
-
           ((int32_t *)output)[0] = ((int32_t *)input1)[0];
           ((int32_t *)output)[1] = ((int32_t *)input2)[0];
 
@@ -99,10 +96,8 @@ void zip_dpu(__mram_ptr void *table_entries_1, __mram_ptr void *table_entries_2,
       }
 
     } else {
-
       for (int i = pid_times_block_size; i < divisible_len;
            i += block_times_tasklets) {
-
         mram_read((__mram_ptr void *)table_entries_1 + i_input1, input1_block,
                   input_block_size_1);
         mram_read((__mram_ptr void *)table_entries_2 + i_input2, input2_block,
@@ -115,7 +110,6 @@ void zip_dpu(__mram_ptr void *table_entries_1, __mram_ptr void *table_entries_2,
         output = output_block;
 
         for (int j = 0; j < copy_block_size; j++) {
-
           for (int k = 0; k < input_type_1_div_4; k++) {
             ((int32_t *)output)[k] = ((int32_t *)input1)[k];
           }
@@ -143,7 +137,6 @@ void zip_dpu(__mram_ptr void *table_entries_1, __mram_ptr void *table_entries_2,
   } else {
     for (int i = pid_times_block_size; i < divisible_len;
          i += block_times_tasklets) {
-
       mram_read((__mram_ptr void *)table_entries_1 + i_input1, input1_block,
                 input_block_size_1);
       mram_read((__mram_ptr void *)table_entries_2 + i_input2, input2_block,
@@ -156,7 +149,6 @@ void zip_dpu(__mram_ptr void *table_entries_1, __mram_ptr void *table_entries_2,
       output = output_block;
 
       for (int j = 0; j < copy_block_size; j++) {
-
         for (int k = 0; k < input_type_1_div_4; k++) {
           ((int32_t *)output)[k] = ((int32_t *)input1)[k];
         }
@@ -206,7 +198,6 @@ void zip_dpu(__mram_ptr void *table_entries_1, __mram_ptr void *table_entries_2,
     output = output_block;
 
     for (int j = 0; j < rest_len; j++) {
-
       for (int k = 0; k < input_type_1_div_4; k++) {
         ((int32_t *)output)[k] = ((int32_t *)input1)[k];
       }

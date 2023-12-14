@@ -153,7 +153,6 @@ void gather_tables_to_host(struct dpu_set_t set, void *my_table, uint32_t len,
   struct dpu_set_t dpu;
 
   DPU_FOREACH(set, dpu, i) {
-
     DPU_ASSERT(dpu_prepare_xfer(dpu, tables + i * aligned_table_size));
   }
   DPU_ASSERT(dpu_push_xfer(set, DPU_XFER_FROM_DPU, DPU_MRAM_HEAP_POINTER_NAME,

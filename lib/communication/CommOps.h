@@ -1,13 +1,14 @@
 #ifndef COMMOPS_H
 #define COMMOPS_H
-#include "../management/Management.h"
-#include "../processing/ProcessingHelperHost.h"
-#include "CommHelper.h"
 #include <dlfcn.h>
 #include <dpu.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "../management/Management.h"
+#include "../processing/ProcessingHelperHost.h"
+#include "CommHelper.h"
 
 /*
 malloc_*_aligned allocates memory on host for alignent requirements of UPMEM,

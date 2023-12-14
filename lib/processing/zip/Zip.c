@@ -13,7 +13,6 @@ void table_zip(const char *src1_name, const char *src2_name,
   }
 
   if (binary_handle->func_type == 2) {
-
     // timing
     double kernel_time = 0;
 

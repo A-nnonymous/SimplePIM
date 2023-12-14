@@ -22,7 +22,6 @@ void table_map(const char *src_name, const char *dest_name,
   table_host_t *src_table = lookup_table(src_name, table_management);
 
   if (binary_handle->func_type == 0 && src_table->is_virtual_zipped == 0) {
-
     // timing
     gettimeofday(&start_time, NULL);
 

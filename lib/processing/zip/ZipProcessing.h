@@ -1,6 +1,5 @@
 #ifndef ZIPPROCESSING_H
 #define ZIPPROCESSING_H
-#include "../ProcessingHelper.h"
 #include <alloc.h>
 #include <barrier.h>
 #include <defs.h>
@@ -8,6 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "../ProcessingHelper.h"
 
 void zip_dpu(__mram_ptr void *table_entries_1, __mram_ptr void *table_entries_2,
              __mram_ptr void *table_entries_res, uint32_t input_type_1,

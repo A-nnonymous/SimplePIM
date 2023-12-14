@@ -1,14 +1,15 @@
 #ifndef MAP_H
 #define MAP_H
-#include "../../management/Management.h"
-#include "../ProcessingHelperHost.h"
-#include "MapArgs.h"
 #include <dpu.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
+
+#include "../../management/Management.h"
+#include "../ProcessingHelperHost.h"
+#include "MapArgs.h"
 
 /*
     table_map implements the array map operator as in the paper
